@@ -63,8 +63,8 @@ Supporting files: `app/components/Portfolio.tsx` (deck orchestration),
   marked `{TODO}` in `FloatingIsland.tsx`.
 - AcrossChat detail page (`/work/acrosschat`) and the Research / Solution /
   Future Plans tabs render `{TODO: copy}` — no Figma content provided.
-- Mobile **Areas of Practice** order (Service Design first) differs from the
-  desktop frame; the mobile order is used here.
+- The project detail page (`/work/[slug]`) is still mobile-only — no desktop
+  Figma frame provided yet, so it keeps the single-column layout at all widths.
 
 ## Develop
 

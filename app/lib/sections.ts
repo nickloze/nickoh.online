@@ -29,10 +29,13 @@ export const LANDING = {
     ", a Creative Technologist and Product/Service Designer who treats problem-solving as the real intervention. Service design is the lens, Digital is the medium. Form follows function, believing anything can be solved beautifully.",
 };
 
-/** Tag order matches the mobile About frame (269:2756), which differs from
- *  desktop — Service Design leads on mobile. */
+/** Areas-of-practice tags. The mobile frame (269:2756) and the desktop frame
+ *  (240:1461) order them differently — Service Design leads on mobile, UI/UX
+ *  leads on desktop — so each breakpoint keeps its own order. Beyond Design is
+ *  the same on both. */
 export const ABOUT = {
   areasOfPractice: ["Service Design", "Branding Identity", "AI Technologist", "UI/UX"],
+  areasOfPracticeDesktop: ["UI/UX", "Service Design", "AI Technologist", "Branding Identity"],
   beyondDesign: ["Climbing", "Fitness", "Cooking"],
 };
 
@@ -50,8 +53,9 @@ export interface WorkProject {
   hero: string;
 }
 
-/** The tab strip on a project detail page (frames 275:4105 / 275:4224). */
-export const PROJECT_TABS = ["Overview", "Research", "Solution", "Future Plans"] as const;
+/** The four screens of a project case study, in scroll order
+ *  (frames 275:4105 / 299:6016 / 299:6017 / 290:5028). */
+export const PROJECT_TABS = ["Overview", "Research", "Solution", "Outcome"] as const;
 export type ProjectTab = (typeof PROJECT_TABS)[number];
 
 /** Work Library projects. New projects are added here under the same label. */
@@ -64,7 +68,7 @@ export const PETCH: WorkProject = {
   overview:
     "Petch is an AI-powered health app that bridges the health literacy gap for young adults aged 18-35. The problem isn't knowing, it's doing. Petch closes that gap through gamified learning that personalises to understand your health by tracking your patterns and habits, with the end goal of turning healthier actions into lasting habits.",
   tags: ["UI/UX", "AI", "Gamification"],
-  hero: "/figma/petch-hero.png",
+  hero: "/figma/petch/overview1.png",
 };
 
 export const ACROSSCHAT: WorkProject = {

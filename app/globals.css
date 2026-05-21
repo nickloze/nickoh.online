@@ -63,9 +63,34 @@ body {
   -webkit-text-size-adjust: 100%;
 }
 
-/* The deck (/) pins itself to the viewport and never scrolls; the project
-   detail route is a normal scrolling document. */
+/* The home deck (/) and the Petch case study both pin to the viewport: the
+   deck never scrolls, the case study scrolls internally with snap pagination.
+   The generic project detail route is a normal scrolling document. */
 body {
   overscroll-behavior-y: none;
   -webkit-tap-highlight-color: transparent;
 }
+
+/* Hide the scrollbar on the Petch case study's snap-scroll container. */
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Paragraph rhythm. A unitless ratio so the same proportional leading holds at
+   every type size — @desktop and @mobile share this one value. */
+p {
+  line-height: 1.7;
+}
+
+/* @mobile — the Petch case study runs smaller, tighter type than the site
+   defaults so each screen fits one swipe beside a clearly visible image. */
+.petch-case-study :is(h1, h2) {
+  line-height: 1.25;
+}
+.petch-case-study p {
+  line-height: 1.5;
+}
+

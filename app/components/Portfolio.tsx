@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useSectionNavigation } from "../hooks/useSectionNavigation";
 import { ACROSSCHAT, FIRST_WORK_INDEX, PETCH, SECTIONS } from "../lib/sections";
 import SectionStage from "./SectionStage";
@@ -29,7 +29,22 @@ const isWorkIndex = (index: number) => SECTIONS[index]?.id.startsWith("work-") ?
 export default function Portfolio() {
   const [showTitleCard, setShowTitleCard] = useState(false);
   const { activeIndex, direction, goTo } = useSectionNavigation(SECTIONS.length, showTitleCard);
-  const prevIndex = useRef(activeIndex);
+  // Play the Work Library title card the instant navigation enters a Work
+  // section from outside it. Decided during render (not in an effect) so the
+  // card mounts in the same commit as the section — there is no frame where
+  // the project shows before the card has covered it.
+  // @mobile only — @desktop has no title-card transition (boundary is `md`, 768px).
+  const [prevIndex, setPrevIndex] = useState(activeIndex);
+  if (activeIndex !== prevIndex) {
+    setPrevIndex(activeIndex);
+    if (
+      isWorkIndex(activeIndex) &&
+      !isWorkIndex(prevIndex) &&
+      !window.matchMedia("(min-width: 768px)").matches
+    ) {
+      setShowTitleCard(true);
+    }
+  }
 
   // Returning from a project page replays the Work Library title card.
   useEffect(() => {
@@ -42,14 +57,6 @@ export default function Portfolio() {
     }
     if (replay) goTo(FIRST_WORK_INDEX);
   }, [goTo]);
-
-  // Entering the Work Library from outside it plays the title card.
-  useEffect(() => {
-    if (isWorkIndex(activeIndex) && !isWorkIndex(prevIndex.current)) {
-      setShowTitleCard(true);
-    }
-    prevIndex.current = activeIndex;
-  }, [activeIndex]);
 
   const dismissTitleCard = useCallback(() => setShowTitleCard(false), []);
 
