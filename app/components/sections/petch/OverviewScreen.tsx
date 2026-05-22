@@ -16,7 +16,7 @@ export default function OverviewScreen() {
           src={PETCH.hero}
           alt="The Petch app open on a phone"
           fill
-          sizes="300px"
+          sizes="440px"
           loading="eager"
           className="object-contain"
         />

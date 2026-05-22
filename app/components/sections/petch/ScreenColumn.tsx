@@ -7,15 +7,16 @@ interface ScreenColumnProps {
 }
 
 /**
- * @mobile — the centred 300px content column shared by every Petch case study
- * screen. It fills exactly one viewport (so every screen snaps one-per-swipe)
- * and pads itself clear of the fixed tab strip above and the floating island
- * below.
+ * @mobile — the centred content column shared by the paginated Petch case study
+ * screens (Overview, Research, Solution). It fills the frame width with an 18px
+ * margin each side and stands exactly one viewport tall (so every screen snaps
+ * one-per-swipe), padding itself clear of the fixed tab strip above and the
+ * floating island below.
  */
 export default function ScreenColumn({ children, className = "" }: ScreenColumnProps) {
   return (
     <div
-      className={`flex w-[300px] max-w-[calc(100vw-36px)] flex-1 flex-col pt-[calc(env(safe-area-inset-top)+54px)] pb-[calc(env(safe-area-inset-bottom)+130px)] ${className}`}
+      className={`flex w-[calc(100vw-36px)] max-w-[440px] flex-1 flex-col pt-[calc(env(safe-area-inset-top)+54px)] pb-[calc(env(safe-area-inset-bottom)+100px)] ${className}`}
     >
       {children}
     </div>

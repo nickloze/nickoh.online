@@ -42,7 +42,7 @@ export default function ResearchScreen() {
             "A research participant holding the Petch app, beside the quote: “Reminds people without them realising they need the reminder…”"
           }
           fill
-          sizes="300px"
+          sizes="440px"
           className="object-contain"
         />
       </div>

@@ -78,8 +78,9 @@ export default function SolutionScreen() {
               key={current.key}
               src={current.image}
               alt={current.alt}
-              width={300}
-              height={141}
+              width={1200}
+              height={563}
+              sizes="440px"
               className="h-auto w-full rounded-[10px] border-2 border-surface"
             />
           </div>
