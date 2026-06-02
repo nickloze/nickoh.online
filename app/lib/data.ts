@@ -205,12 +205,12 @@ export const stack: StackGroup[] = [
   { cat: "systems", items: ["Notion", "Supabase"] },
 ];
 
-export type ContactRow = { label: string; value: string; href: string };
+export type ContactRow = { label: string; value: string; href: string; external?: boolean };
 
 export const contactRows: ContactRow[] = [
   { label: "Email", value: "nicklozekoh@gmail.com", href: "mailto:nicklozekoh@gmail.com" },
-  { label: "Linkedin", value: "/in/nickoh-archive", href: "#" },
-  { label: "Instagram", value: "@nichawyee", href: "#" },
+  { label: "Linkedin", value: "/in/nickloze", href: "https://www.linkedin.com/in/nickloze/", external: true },
+  { label: "Instagram", value: "@nichawyee", href: "https://www.instagram.com/nichawyee", external: true },
 ];
 
 /* The handoff stored dropped images in a sidecar keyed by slot id. Those were

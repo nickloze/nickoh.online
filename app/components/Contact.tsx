@@ -73,6 +73,8 @@ export default function Contact({ isMobile }: { isMobile: boolean }) {
             <a
               key={c.label}
               href={c.href}
+              target={c.external ? "_blank" : undefined}
+              rel={c.external ? "noopener noreferrer" : undefined}
               style={{
                 display: "flex",
                 alignItems: "center",
