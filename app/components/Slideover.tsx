@@ -334,9 +334,12 @@ export default function Slideover({
                       {p.galleryMiddleSingle ? (
                         <ImageTile slotId={`${p.slot}-${p.gallery[1]}`} alt={`${p.name} screen 2`} isMobile={isMobile} aspect="16/9" fit="contain" />
                       ) : (
-                        <div style={{ display: "flex", flexDirection: isMobile ? "column" : "row", gap: 16 }}>
-                          <ImageTile slotId={`${p.slot}-${p.gallery[1]}`} alt={`${p.name} screen 2`} isMobile={isMobile} grow aspect="1/1" fit="contain" sizes="(max-width: 880px) 92vw, 480px" />
-                          <ImageTile slotId={`${p.slot}-${p.gallery[2]}`} alt={`${p.name} screen 3`} isMobile={isMobile} grow aspect="1/1" fit="contain" sizes="(max-width: 880px) 92vw, 480px" />
+                        // grid (not flex grow): a 1fr track gives each square a
+                        // definite width so aspect-ratio can derive its height.
+                        // flex:1 1 0 collapsed these to 0px in the mobile column.
+                        <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 16 }}>
+                          <ImageTile slotId={`${p.slot}-${p.gallery[1]}`} alt={`${p.name} screen 2`} isMobile={isMobile} aspect="1/1" fit="contain" sizes="(max-width: 880px) 92vw, 480px" />
+                          <ImageTile slotId={`${p.slot}-${p.gallery[2]}`} alt={`${p.name} screen 3`} isMobile={isMobile} aspect="1/1" fit="contain" sizes="(max-width: 880px) 92vw, 480px" />
                         </div>
                       )}
                       <ImageTile slotId={`${p.slot}-${p.gallery[3]}`} alt={`${p.name} screen 4`} isMobile={isMobile} aspect="16/9" fit="contain" />
