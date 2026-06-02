@@ -1,78 +1,213 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
-import { useSectionNavigation } from "../hooks/useSectionNavigation";
-import { ACROSSCHAT, FIRST_WORK_INDEX, PETCH, SECTIONS } from "../lib/sections";
-import SectionStage from "./SectionStage";
-import WorkLibraryTitleCard from "./WorkLibraryTitleCard";
-import DotNav from "./navigation/DotNav";
-import FloatingIsland from "./navigation/FloatingIsland";
-import AboutSection from "./sections/AboutSection";
-import LandingSection from "./sections/LandingSection";
-import WorkLibrarySection from "./sections/WorkLibrarySection";
+/* Root of the portfolio. Owns the frame (sidebar + scrolling main + slide-over),
+   the viewport split, the active-section scroll-spy, and the global Escape /
+   mobile-nav state. One responsive codebase — @desktop (≥880px) shows the fixed
+   296px rail; @mobile (<880px) collapses it to a slide-in overlay with a top
+   header bar. Ported from project/app.jsx (App). */
 
-/** The five section views, indexed to match SECTIONS. */
-const SECTION_VIEWS = [
-  <LandingSection key="landing" />,
-  <AboutSection key="about" />,
-  <WorkLibrarySection key="petch" project={PETCH} />,
-  <WorkLibrarySection key="acrosschat" project={ACROSSCHAT} />,
-];
+import { useCallback, useEffect, useRef, useState } from "react";
+import Sidebar from "./Sidebar";
+import Hero from "./Hero";
+import ProjectsStack from "./ProjectsStack";
+import Stack from "./Stack";
+import Contact from "./Contact";
+import Slideover from "./Slideover";
+import { Icon } from "./ui/icons";
+import { projects, type Project } from "../lib/data";
 
-const isWorkIndex = (index: number) => SECTIONS[index]?.id.startsWith("work-") ?? false;
-
-/**
- * Orchestrates the single-page portfolio deck: owns the active-section state,
- * wires up paginated navigation, and plays the Work Library title card on
- * entry into the Work sections (and on return from a project page).
- */
-export default function Portfolio() {
-  const [showTitleCard, setShowTitleCard] = useState(false);
-  const { activeIndex, direction, goTo } = useSectionNavigation(SECTIONS.length, showTitleCard);
-  // Play the Work Library title card the instant navigation enters a Work
-  // section from outside it. Decided during render (not in an effect) so the
-  // card mounts in the same commit as the section — there is no frame where
-  // the project shows before the card has covered it.
-  // @mobile only — @desktop has no title-card transition (boundary is `md`, 768px).
-  const [prevIndex, setPrevIndex] = useState(activeIndex);
-  if (activeIndex !== prevIndex) {
-    setPrevIndex(activeIndex);
-    if (
-      isWorkIndex(activeIndex) &&
-      !isWorkIndex(prevIndex) &&
-      !window.matchMedia("(min-width: 768px)").matches
-    ) {
-      setShowTitleCard(true);
-    }
-  }
-
-  // Returning from a project page replays the Work Library title card.
+/* Width-only viewport hook. Initialised to a desktop default so the server
+   render and the first client render agree (no hydration mismatch); the real
+   size lands in the mount effect. The @mobile/@desktop boundary is 880px. */
+function useViewport() {
+  const [size, setSize] = useState({ w: 1440, h: 900 });
   useEffect(() => {
-    let replay = false;
-    try {
-      replay = sessionStorage.getItem("replayWorkTitleCard") === "1";
-      if (replay) sessionStorage.removeItem("replayWorkTitleCard");
-    } catch {
-      /* sessionStorage unavailable — skip the replay */
-    }
-    if (replay) goTo(FIRST_WORK_INDEX);
-  }, [goTo]);
+    const onResize = () => setSize({ w: window.innerWidth, h: window.innerHeight });
+    onResize();
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+  return size;
+}
 
-  const dismissTitleCard = useCallback(() => setShowTitleCard(false), []);
+export default function Portfolio() {
+  const { w } = useViewport();
+  const isMobile = w < 880;
+
+  const [active, setActive] = useState("about");
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const mainRef = useRef<HTMLElement>(null);
+
+  /* esc closes the slide-over first, then the mobile sidebar */
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        if (selectedProject) setSelectedProject(null);
+        else if (mobileSidebarOpen) setMobileSidebarOpen(false);
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [selectedProject, mobileSidebarOpen]);
+
+  /* scroll-spy — highlight the nav item for whichever section brackets the
+     scroll position (+120px so the change fires once a section is well in view) */
+  useEffect(() => {
+    const ref = mainRef.current;
+    if (!ref) return;
+    let raf = 0;
+    const sections = ["about", "projects", "stack", "contact"];
+    const compute = () => {
+      raf = 0;
+      const scrollPos = ref.scrollTop + 120;
+      for (const s of sections) {
+        const el = document.getElementById(s);
+        if (!el) continue;
+        if (el.offsetTop <= scrollPos && el.offsetTop + el.offsetHeight > scrollPos) {
+          setActive(s);
+          break;
+        }
+      }
+    };
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(compute);
+    };
+    ref.addEventListener("scroll", onScroll, { passive: true });
+    compute();
+    return () => {
+      ref.removeEventListener("scroll", onScroll);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, []);
+
+  const scrollTo = useCallback((id: string) => {
+    setActive(id); // optimistic: move the highlight before the scroll settles
+    const el = document.getElementById(id);
+    if (el && mainRef.current) {
+      mainRef.current.scrollTo({ top: el.offsetTop - 24, behavior: "smooth" });
+    }
+  }, []);
+
+  /* close the mobile sidebar when a project opens */
+  useEffect(() => {
+    if (selectedProject) setMobileSidebarOpen(false);
+  }, [selectedProject]);
 
   return (
-    <main className="fixed inset-0 overflow-hidden bg-white">
-      <div className="relative mx-auto h-full w-full max-w-[1080px]">
-        <SectionStage activeIndex={activeIndex} direction={direction}>
-          {SECTION_VIEWS[activeIndex]}
-        </SectionStage>
-        <DotNav count={SECTIONS.length} activeIndex={activeIndex} onSelect={goTo} />
-        <FloatingIsland
-          activeKey={isWorkIndex(activeIndex) ? "work" : null}
-          onWorkLibrary={() => goTo(FIRST_WORK_INDEX)}
+    <div
+      style={{
+        width: "100%",
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        background: "var(--bg-black)",
+        overflow: "hidden",
+        position: "relative",
+      }}
+    >
+      {isMobile && !selectedProject && (
+        <header
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 12,
+            padding: "0 12px",
+            // @mobile — clear the Dynamic Island / status bar safe area
+            paddingTop: "env(safe-area-inset-top)",
+            height: "calc(52px + env(safe-area-inset-top))",
+            flexShrink: 0,
+            background: "var(--bg-panel)",
+            borderBottom: "1px solid var(--border-default)",
+            zIndex: 50,
+            borderRadius: "0px 0px 12px 12px",
+          }}
+        >
+          <button
+            onClick={() => setMobileSidebarOpen((o) => !o)}
+            aria-label="open navigation"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+              width: 36,
+              height: 36,
+              flexShrink: 0,
+              color: "var(--zinc-300)",
+              background: "var(--bg-raised)",
+              border: "1px solid var(--border-default)",
+              borderRadius: "50%",
+            }}
+          >
+            <Icon.Menu size={16} />
+          </button>
+          <span
+            style={{
+              flex: 1,
+              textAlign: "center",
+              fontSize: 14,
+              fontWeight: 600,
+              color: "var(--zinc-100)",
+              letterSpacing: "-0.01em",
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+            }}
+          >
+            Nicholas Koh&apos;s Online Home
+          </span>
+          {/* spacer to keep the title centered against the menu button */}
+          <span style={{ width: 36, flexShrink: 0 }} />
+        </header>
+      )}
+
+      <div style={{ display: "flex", flex: 1, minHeight: 0, position: "relative" }}>
+        {/* mobile sidebar backdrop — kept mounted so it can fade out */}
+        {isMobile && (
+          <div
+            onClick={() => setMobileSidebarOpen(false)}
+            style={{
+              position: "absolute",
+              inset: 0,
+              background: "rgba(0,0,0,0.6)",
+              zIndex: 55,
+              opacity: mobileSidebarOpen ? 1 : 0,
+              pointerEvents: mobileSidebarOpen ? "auto" : "none",
+              transition: "opacity 320ms cubic-bezier(0.32, 0.72, 0.24, 1)",
+            }}
+          />
+        )}
+
+        <Sidebar
+          active={active}
+          onNav={scrollTo}
+          isMobile={isMobile}
+          mobileOpen={mobileSidebarOpen}
+          onClose={() => setMobileSidebarOpen(false)}
         />
-        {showTitleCard && <WorkLibraryTitleCard onComplete={dismissTitleCard} />}
+
+        <main
+          ref={mainRef}
+          className="scroll-thin"
+          style={{
+            flex: 1,
+            minWidth: 0,
+            overflowY: "auto",
+            background: "var(--bg-black)",
+            // @mobile — keep content clear of the home indicator
+            paddingBottom: "env(safe-area-inset-bottom)",
+          }}
+        >
+          <Hero isMobile={isMobile} />
+          {/* Experience held back for now — restore by un-commenting:
+              <Experience isMobile={isMobile} /> */}
+          <ProjectsStack projects={projects} onSelect={setSelectedProject} isMobile={isMobile} />
+          <Stack isMobile={isMobile} />
+          <Contact isMobile={isMobile} />
+        </main>
+
+        <Slideover project={selectedProject} onClose={() => setSelectedProject(null)} isMobile={isMobile} />
       </div>
-    </main>
+    </div>
   );
 }
