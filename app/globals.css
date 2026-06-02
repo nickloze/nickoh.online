@@ -1,96 +1,141 @@
-@import "tailwindcss";
+/* nic.os portfolio — design tokens + base styles.
+   Ported from the Claude Design handoff (project/index.html <style>).
+   The UI is built with inline styles per component (faithful to the prototype),
+   so this file carries only the token system, resets, and a few shared helpers.
+   One responsive codebase — @desktop (≥880px) and @mobile (<880px) share these
+   tokens; per-viewport layout lives in the components. */
 
-@theme {
-  --color-ink: #000000;
-  --color-ink-soft: #1d1d1d;
-  --color-muted: #81808e;
-  --color-surface: #efefef;
-  --color-dot: #dedede;
-  --color-dot-active: #a3a3a3;
-}
-
-@theme inline {
-  --font-sans: var(--font-inter), system-ui, sans-serif;
-}
-
-/* Responsive type scale. Mobile (24/16) and desktop (32/20) are Figma sources
-   of truth; tablet (28/18) is interpolated between them. */
 :root {
-  /* Type holds the Figma size at the 375px baseline and above, and scales
-     down with width on smaller phones so the no-scroll deck still fits. */
-  --fs-primary: clamp(20px, 6.4vw, 24px);
-  --fs-small: clamp(13px, 4.27vw, 16px);
-  /* Deck spacing: edge margin and the content's left inset (edge + 24px dot
-     column + gap). Tightened below 375px so narrow screens keep room. */
-  --deck-edge: 34px;
-  --deck-pad-l: 98px;
+  /* surfaces — the near-black ladder: #0a → #0b → #0c → #0d → #11 → #16 */
+  --bg-black: #0a0a0a;
+  --bg-panel: #0d0d0d;
+  --bg-raised: #161616;
+  --bg-card-hover: #111111;
+  --bg-stack-card: #0c0c0c;
+  --bg-slideover: #0b0b0b;
+  --bg-slideover-header: #0d0d0d;
+
+  /* text (zinc scale) */
+  --zinc-100: #f4f4f5;
+  --zinc-200: #e4e4e7;
+  --zinc-300: #d4d4d8;
+  --zinc-400: #a1a1aa;
+  --zinc-500: #71717a;
+  --zinc-600: #52525b;
+  --zinc-700: #3f3f46;
+  --zinc-800: #27272a;
+  --zinc-900: #18181b;
+  --zinc-950: #09090b;
+
+  /* borders */
+  --border-default: rgba(39, 39, 42, 0.6); /* zinc-800/60 */
+  --border-section: #18181b; /* zinc-900 */
+  --border-hover: #3f3f46; /* zinc-700 */
+
+  /* accents — one slot per project, never decorative */
+  --mint: #7cffb2;
+  --amber: #ffb870;
+  --blue: #a8c5ff;
+  --pink: #ff8fb1;
+
+  /* chrome */
+  --emerald-400: #34d399;
+  --emerald-500: #10b981;
+
+  /* type — only Geist is loaded (next/font). mono/serif keep system fallbacks
+     since the shipped design uses Geist throughout. */
+  --sans: var(--font-geist), system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --serif: "Newsreader", "Iowan Old Style", Georgia, serif;
 }
 
-@media (max-width: 374px) {
-  :root {
-    --deck-edge: 18px;
-    --deck-pad-l: 64px;
-  }
-}
-
-@media (min-width: 768px) {
-  :root {
-    --fs-primary: 28px;
-    --fs-small: 18px;
-  }
-}
-
-@media (min-width: 1280px) {
-  :root {
-    --fs-primary: 32px;
-    --fs-small: 20px;
-  }
-}
-
-.fs-primary {
-  font-size: var(--fs-primary);
-}
-
-.fs-small {
-  font-size: var(--fs-small);
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 
 html,
 body {
-  background-color: #ffffff;
-  color: #000000;
-  letter-spacing: -0.01em;
-  -webkit-text-size-adjust: 100%;
+  height: 100%;
 }
 
-/* The home deck (/) and the Petch case study both pin to the viewport: the
-   deck never scrolls, the case study scrolls internally with snap pagination.
-   The generic project detail route is a normal scrolling document. */
+html {
+  color-scheme: dark;
+}
+
 body {
-  overscroll-behavior-y: none;
-  -webkit-tap-highlight-color: transparent;
-}
-
-/* Hide the scrollbar on the Petch case study's snap-scroll container. */
-.no-scrollbar {
-  scrollbar-width: none;
-}
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-
-/* Paragraph rhythm. A unitless ratio so the same proportional leading holds at
-   every type size — @desktop and @mobile share this one value. */
-p {
-  line-height: 1.7;
-}
-
-/* @mobile — the Petch case study runs smaller, tighter type than the site
-   defaults so each screen fits one swipe beside a clearly visible image. */
-.petch-case-study :is(h1, h2) {
-  line-height: 1.25;
-}
-.petch-case-study p {
+  margin: 0;
+  /* keep iOS rubber-band from flashing white behind the near-black surface */
+  background: #000;
+  background-color: var(--bg-black);
+  color: var(--zinc-200);
+  font-family: var(--sans);
+  font-size: 14px;
   line-height: 1.5;
+  letter-spacing: -0.01em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-variant-ligatures: none;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+  /* the main column scrolls internally; the document itself never does */
+  overflow: hidden;
+  overscroll-behavior-y: none;
 }
 
+button {
+  font: inherit;
+  color: inherit;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* numerals that shouldn't jitter (years, ids) */
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* narrow, terminal-feeling scrollbar on the scrollable regions */
+.scroll-thin {
+  scrollbar-width: thin;
+  scrollbar-color: #27272a #0a0a0a;
+}
+.scroll-thin::-webkit-scrollbar {
+  width: 8px;
+}
+.scroll-thin::-webkit-scrollbar-track {
+  background: var(--bg-black);
+}
+.scroll-thin::-webkit-scrollbar-thumb {
+  background: #27272a;
+  border-radius: 4px;
+}
+.scroll-thin::-webkit-scrollbar-thumb:hover {
+  background: #3f3f46;
+}
+
+/* accessible but minimal focus rings */
+:focus-visible {
+  outline: 1px solid var(--zinc-600);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+::selection {
+  background: #1f2a22;
+  color: var(--mint);
+}
