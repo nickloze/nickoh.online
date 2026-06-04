@@ -2,9 +2,10 @@
 
 /* Root of the portfolio. Owns the frame (sidebar + scrolling main + slide-over),
    the viewport split, the active-section scroll-spy, and the global Escape /
-   mobile-nav state. One responsive codebase — @desktop (≥880px) shows the fixed
-   296px rail; @mobile (<880px) collapses it to a slide-in overlay with a top
-   header bar. Ported from project/app.jsx (App). */
+   mobile-nav state. One responsive codebase — @desktop/@ipad (≥880px) show a
+   collapsed 64px icon rail that expands to 296px on hover and floats over the
+   content; @mobile (<880px) uses a slide-in overlay with a top header bar.
+   Ported from project/app.jsx (App). */
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Sidebar from "./Sidebar";
