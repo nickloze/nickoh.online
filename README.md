@@ -1,74 +1,48 @@
 # nickoh.online
 
-Mobile portfolio for **Nicholas Koh** — Creative Technologist & Product/Service
-Designer. Built mobile-first against the iPhone-17-Pro Figma frames.
+Portfolio for **Nicholas Koh** — Product Designer, Singapore.
+
+One page. A folder on the left (About / Let's Chat / Download CV) and a feed of
+project cards on the right. The folder never moves; the feed is the only thing
+on the page that scrolls, and it scrolls without a visible scrollbar.
+
+## Source of truth
+
+Figma file `k56TffzeUrNoE61NvHqRj3` — desktop frame `373:2659`, mobile frame
+`441:243`, folder component set `434:3685`. Every size, colour, radius and
+string in the code is lifted from those nodes; see `CLAUDE.md` for the
+viewport tokens (`@desktop` 1512, `@mobile` 402).
 
 ## Stack
 
-Next.js 16 (App Router) · React 19 · TypeScript · Tailwind CSS v4 ·
-[Motion](https://motion.dev) for animation · Inter self-hosted via `next/font`.
+Next.js 16 (App Router) · React 19 · TypeScript · Tailwind v4 (`@theme` tokens
+in `app/globals.css`) · [Motion](https://motion.dev) · Inter and EB Garamond
+via `next/font`.
 
-## Routes
+## Where things live
 
-- `/` — the **deck**: four vertically-paginated sections that cross-fade one at
-  a time (Landing → About → Work·Petch → Work·AcrossChat). The document never
-  scrolls; one swipe / wheel / arrow-key advances one section.
-- `/work/[slug]` — a **project detail page** (scrollable) with a top tab strip,
-  a hero image, and the persistent floating island. Prerendered for `petch` and
-  `acrosschat`.
+```
+app/components/Shell.tsx        one DOM tree; CSS grid areas swap the layout at 1024px
+app/components/panel/           the folder: tabs, the travelling notch, the three panes
+app/components/work/            the feed and the project card
+app/motion/                     every animation number — nothing is inlined elsewhere
+app/lib/data.ts                 all copy and hrefs
+```
 
-## Figma → component map
+## The folder tab
 
-File: `figma.com/design/cdlapN6h7IQ2PzhiDxJpQE/Website`
+The active tab is one SVG `<path>` whose numbers are driven by three springs
+(left edge, right edge, left-edge slant). Clicking a tab retargets the springs,
+so the notch slides and reshapes in one motion and a click mid-flight redirects
+it from wherever it is. `app/motion/tabNotch.ts` holds the geometry, taken from
+the exported Figma vectors.
 
-| Node | Frame | Component |
-|---|---|---|
-| `261:2230` | Landing | `app/components/sections/LandingSection.tsx` |
-| `262:2474` | About — collapsed | `app/components/sections/AboutSection.tsx` (collapsed state) |
-| `269:2756` | About — expanded | `app/components/sections/AboutSection.tsx` (expanded state) |
-| `271:3395` | Work Library title card | `app/components/WorkLibraryTitleCard.tsx` |
-| `274:3568` | Petch card | `app/components/sections/WorkLibrarySection.tsx` (`project={PETCH}`) |
-| `274:3808` | AcrossChat card † | `app/components/sections/WorkLibrarySection.tsx` (`project={ACROSSCHAT}`) |
-| `275:4105` | Petch — Overview tab | `app/components/ProjectDetail.tsx` |
-| `275:4224` | Petch — Research tab | `app/components/ProjectDetail.tsx` |
+Download CV plays the keyframes Figma exported for the card (`app/motion/resumeCard.ts`),
+then settles back; hovering the folder raises the card; clicking it opens the
+PDF in a new tab.
 
-Persistent chrome (in every frame): dot navigation →
-`app/components/navigation/DotNav.tsx`; floating island →
-`app/components/navigation/FloatingIsland.tsx`.
-
-Supporting files: `app/components/Portfolio.tsx` (deck orchestration),
-`app/components/SectionStage.tsx` (cross-fade), `app/hooks/useSectionNavigation.ts`
-(paginated input), `app/lib/sections.ts` (all copy & project data),
-`app/components/ui/icons.tsx` (icons inlined 1:1 from Figma).
-
-## Architecture notes
-
-- **Title card** — `WorkLibraryTitleCard` is a reusable transition (symbol
-  fades in → word follows → holds → fades out → `onComplete`). It plays when
-  entering the Work sections and replays when returning from a project page.
-- **About / Work** each have a collapsed and an expanded state. The About
-  chevron is a real `<button>`; tapping it staggers the practice tags in.
-- **Detail page** — the hero image fades on scroll (`useScroll`); the tab strip
-  and island stay fixed. Only the Overview tab has real copy.
-- **Reduced motion** — all scroll/title-card/stagger animations have
-  non-animated fallbacks under `prefers-reduced-motion`.
-- Type and deck spacing scale down below the 375 px baseline so the no-scroll
-  deck still fits small phones; 375 px and up render the Figma sizes exactly.
-
-## Open items (need Nic's input)
-
-- The prompt's frame map labels `274:3808` as a "project hero state"; the frame
-  actually contains the **AcrossChat card**. Built as such.
-- Floating-island icons 2–4 (chat / résumé / contact) have no destinations yet —
-  marked `{TODO}` in `FloatingIsland.tsx`.
-- AcrossChat detail page (`/work/acrosschat`) and the Research / Solution /
-  Future Plans tabs render `{TODO: copy}` — no Figma content provided.
-- The project detail page (`/work/[slug]`) is still mobile-only — no desktop
-  Figma frame provided yet, so it keeps the single-column layout at all widths.
-
-## Develop
+## Run
 
 ```bash
-npm run dev     # http://localhost:3000
-npm run build   # production build
+npm run dev
 ```

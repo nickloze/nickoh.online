@@ -3,9 +3,11 @@
 # Viewport Design System
 
 ## Overview
-This is Nic's personal portfolio and web presence at **nickoh.online**. The site is responsive — one codebase, one domain, serving the same content and elements at every screen size. But it serves two distinct UI contexts — a desktop web experience and a mobile web experience — and each is a separate, intentional design target. Content, hierarchy, and the navigation model (dot-nav rail, floating island, paginated section deck) carry over between them; what changes per viewport is layout, sizing, and positioning. The mobile view is designed deliberately to the 402px frame — never the desktop layout left to shrink.
+This is Nic's personal portfolio and web presence at **nickoh.online**. The site is responsive — one codebase, one domain, serving the same content at every screen size. But it serves two distinct UI contexts — a desktop web experience and a mobile web experience — and each is a separate, intentional design target. The mobile view is designed deliberately to the 402px frame — never the desktop layout left to shrink.
 
-To distinguish between them, this project uses two viewport tokens:
+**Figma is the single source of truth** (file `k56TffzeUrNoE61NvHqRj3`): desktop frame `373:2659`, mobile frame `441:243`, folder-tab component set `434:3685`. Pull the live frame via the Figma MCP tools; do not build from memory or from pasted exports.
+
+To distinguish between the two contexts, this project uses two viewport tokens:
 
 - `@desktop` — targets the desktop web interface at nickoh.online
 - `@mobile` — targets the mobile web interface at nickoh.online
@@ -14,27 +16,36 @@ These tokens must appear in prompts, file names, folder structure, and inline co
 
 ---
 
+## The page
+
+One page, one DOM tree, two layouts (`app/components/Shell.tsx`):
+
+- **The folder panel** (`app/components/panel/`) — a tactile folder with three tabs: About / Let's Chat / Download CV. One box beneath the tabs whose content follows the active tab (bio · socials list · CV pocket). A single SVG notch travels between tabs and reshapes as it goes; it is never destroyed and recreated. All motion numbers live in `app/motion/` — components import from there and carry no inline animation values.
+- **The work feed** (`app/components/work/`) — the only scrolling region on the page. The document body never scrolls; the scrollbar is hidden. Cards are inert until a project detail view is designed; hover and scrolling expand the cover by 3%.
+- Copy and hrefs live in `app/lib/data.ts`; every string is lifted from Figma.
+
+---
+
 ## What Each Token Means
 
 ### @desktop
-- Reference frame: **1440px wide**
-- Layouts: multi-column or horizontal arrangements, spacious whitespace
-- Navigation: a persistent vertical dot-nav rail, plus a floating island of quick actions (Work Library, Messages, Résumé, Contact) centred at ~75% viewport height
+- Reference frame: **1512px wide** (Figma `373:2659`; 1440 is the secondary check)
+- Layout: 64px frame padding, 24px gap, folder panel fixed at 406px on the left, feed on the right
+- Navigation: the folder tabs; "Available for Work" pinned to the bottom of the panel
 - Interactions: hover states are acceptable and expected
-- Typography: comfortable reading sizes (base 16px, generous line-height)
 - Cursor: pointer-based, precise click targets
 - Domain: nickoh.online
 
 ### @mobile
-- Reference frame: **402px wide** — iPhone 17 Pro CSS viewport (1206px physical ÷ 3x DPR)
+- Reference frame: **402px wide** — iPhone 17 Pro CSS viewport (1206px physical ÷ 3x DPR), Figma `441:243`
 - Device pixel ratio: 3x (@3x assets where applicable)
-- Layouts: single-column, vertically stacked, thumb-friendly
-- Navigation: the same dot-nav rail and floating island; the island is anchored near the bottom, centred above the safe-area inset
+- Layout: single column — the feed scrolls in a window on top (with a fade over its bottom), the folder sits below it at 330.8px wide (the desktop folder scaled by 0.8148 via `--folder-unit`)
 - Interactions: tap and long-press only — no hover-dependent logic
 - Touch targets: minimum 44×44px for all interactive elements
-- Typography: slightly larger tap-friendly text, short line lengths
-- Safe area: respect top (62pt) and bottom (34pt) safe area insets for Dynamic Island
+- Safe area: respect top and bottom safe-area insets for the Dynamic Island and the browser bar
+- No "Available for Work" row (not in the frame)
 - Domain: nickoh.online (same domain, NOT m.nickoh.online)
+- Breakpoint: the layout switches at **1024px** (`desktop:` variant)
 
 ---
 
@@ -50,9 +61,9 @@ These tokens must appear in prompts, file names, folder structure, and inline co
    - File names: `About.desktop.tsx` / `About.mobile.tsx`
    - Folder structure: `/views/desktop/` and `/views/mobile/`
    - Inline comments: `// @desktop — multi-column layout begins here`
-   - Build `@desktop` components to the 1440px frame and `@mobile` components to the 402px frame. (Tailwind — this project's CSS tool — is mobile-first by default: unprefixed utilities are the mobile baseline and `md:`/`lg:` layer on larger screens. The token sets which frame you design *to*; it does not change that base.)
+   - Build `@desktop` components to the 1512px frame and `@mobile` components to the 402px frame. (Tailwind — this project's CSS tool — is mobile-first by default: unprefixed utilities are the mobile baseline and `md:`/`lg:` layer on larger screens. The token sets which frame you design *to*; it does not change that base.)
 
-5. **Same domain, same URLs.** Both the desktop and mobile experiences are served from the same paths under nickoh.online (`/`, `/work/[slug]`) — there is no `m.nickoh.online` and no device-specific routing. The viewport split happens inside the app, by which view renders, not at the URL level.
+5. **Same domain, same URLs.** Both the desktop and mobile experiences are served from the same path under nickoh.online (`/`) — there is no `m.nickoh.online` and no device-specific routing. The viewport split happens inside the app, by CSS grid areas in `Shell`, not at the URL level.
 
 ---
 
@@ -60,8 +71,8 @@ These tokens must appear in prompts, file names, folder structure, and inline co
 
 | Token     | CSS Width | Physical Res     | DPR | Nav Pattern                | Interactions      |
 |-----------|-----------|------------------|-----|----------------------------|-------------------|
-| @desktop  | 1440px    | —                | 1x  | Dot rail + floating island | Hover + Click     |
-| @mobile   | 402px     | 1206 × 2622 px   | 3x  | Dot rail + floating island | Tap + Long-press  |
+| @desktop  | 1512px    | —                | 1x  | Folder tabs                | Hover + Click     |
+| @mobile   | 402px     | 1206 × 2622 px   | 3x  | Folder tabs                | Tap + Long-press  |
 
 ---
 

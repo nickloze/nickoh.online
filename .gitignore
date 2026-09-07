@@ -42,3 +42,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# interaction lab — scratch experiments, never committed or pushed
+/app/test/
+
+# a personal backup archive, not part of the site
+/V2.zip

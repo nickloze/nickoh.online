@@ -1,141 +1,130 @@
-/* nic.os portfolio — design tokens + base styles.
-   Ported from the Claude Design handoff (project/index.html <style>).
-   The UI is built with inline styles per component (faithful to the prototype),
-   so this file carries only the token system, resets, and a few shared helpers.
-   One responsive codebase — @desktop (≥880px) and @mobile (<880px) share these
-   tokens; per-viewport layout lives in the components. */
+/* nickoh.online — design tokens + page-level rules.
+
+   Source of truth: Figma file k56TffzeUrNoE61NvHqRj3
+     @desktop  frame 373:2659 "Main"              1512 × 982
+     @mobile   frame 441:243  "Tabs Compact Dark"  402 × 874
+     folder    component set 434:3685 "Desktop"
+
+   The Figma file defines no variables; every token below is lifted from the
+   raw values on those nodes. Tailwind v4 emits the @theme block as :root
+   custom properties, so the same names work from utilities and from the
+   plain CSS further down. */
+
+@import "tailwindcss";
+
+@theme static {
+  /* colour — all raw hex from the frames */
+  --color-bg: #0e0e0e;
+  --color-fg: #ffffff;
+  --color-fg-muted: rgba(255, 255, 255, 0.75);   /* client name on a card   */
+  --color-fg-dim: rgba(255, 255, 255, 0.5);      /* resting socials rows     */
+  --color-fg-faint: rgba(255, 255, 255, 0.2);    /* inactive tab labels      */
+  --color-tab: #019bff;                          /* the notch                */
+  --color-folder-base: #222222;                  /* under the folder gradient*/
+  --color-available: #6aff00;                    /* availability dot         */
+
+  /* type — Inter carries everything sans (the Figma SF Pro labels included,
+     per Nic's call); EB Garamond carries the bio, socials and "for". */
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-eb-garamond), Georgia, "Times New Roman", serif;
+
+  /* geometry */
+  --breakpoint-desktop: 64rem;                   /* @desktop from 1024px    */
+  --width-panel: 406px;                          /* 373:2661                 */
+  --width-folder-mobile: 330.8px;                /* 461:2630                 */
+  --spacing-frame: 64px;                         /* 373:2659 padding         */
+  --spacing-col-gap: 24px;                       /* 373:2660 gap · 441 gap   */
+  --spacing-card-pt: 12px;
+  --spacing-card-pb: 48px;                       /* 373:2679                 */
+  --spacing-card-pb-mobile: 24px;                /* 437:5317                 */
+  --spacing-mobile-side: 34px;                   /* 373:2715 x               */
+  --spacing-mobile-top: 15px;                    /* 77 − 62 status bar       */
+  --spacing-mobile-bottom: 19px;                 /* 773 → 792 Safari bar     */
+  --radius-card: 4px;
+  --radius-cv-card: 12px;
+
+  /* shadows */
+  --shadow-card: 0 4px 25px rgba(0, 0, 0, 0.1);
+  --shadow-cv: 0 15px 50px 23px rgba(0, 0, 0, 0.05);
+  --shadow-pocket: -9px -3px 50px rgba(0, 0, 0, 0.25);
+}
 
 :root {
-  /* surfaces — the near-black ladder: #0a → #0b → #0c → #0d → #11 → #16 */
-  --bg-black: #0a0a0a;
-  --bg-panel: #0d0d0d;
-  --bg-raised: #161616;
-  --bg-card-hover: #111111;
-  --bg-stack-card: #0c0c0c;
-  --bg-slideover: #0b0b0b;
-  --bg-slideover-header: #0d0d0d;
+  /* The folder is drawn once at 406 wide and every internal size is in em,
+     so one unit scales it: 16px @desktop, 13.04px @mobile (330.8 / 406). */
+  --folder-unit: 13.04px;
 
-  /* text (zinc scale) */
-  --zinc-100: #f4f4f5;
-  --zinc-200: #e4e4e7;
-  --zinc-300: #d4d4d8;
-  --zinc-400: #a1a1aa;
-  --zinc-500: #71717a;
-  --zinc-600: #52525b;
-  --zinc-700: #3f3f46;
-  --zinc-800: #27272a;
-  --zinc-900: #18181b;
-  --zinc-950: #09090b;
-
-  /* borders */
-  --border-default: rgba(39, 39, 42, 0.6); /* zinc-800/60 */
-  --border-section: #18181b; /* zinc-900 */
-  --border-hover: #3f3f46; /* zinc-700 */
-
-  /* accents — one slot per project, never decorative */
-  --mint: #7cffb2;
-  --amber: #ffb870;
-  --blue: #a8c5ff;
-  --pink: #ff8fb1;
-
-  /* chrome */
-  --emerald-400: #34d399;
-  --emerald-500: #10b981;
-
-  /* type — only Geist is loaded (next/font). mono/serif keep system fallbacks
-     since the shipped design uses Geist throughout. */
-  --sans: var(--font-geist), system-ui, -apple-system, "Segoe UI", sans-serif;
-  --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
-  --serif: "Newsreader", "Iowan Old Style", Georgia, serif;
+  /* Gradients are multi-layer in Figma; kept verbatim here rather than in
+     @theme so the layer stacks stay readable. */
+  /* The radial is sized as a proportion of the box, not in fixed units, which
+     is how Figma draws it: the About variant (434:3683) fits it to a 202-tall
+     box (vertical radius 128.3 = 63.5%) and Socials (434:3684) refits it to
+     115 (74.9 = 65.1%). Both therefore reach the outer stop — #009BFF, the
+     notch's colour — well before the top edge, so the tab and the box top read
+     as one piece of card in every state. Pinning it in em instead left the
+     short Socials box entirely inside the light centre of the radial and its
+     top edge came out #1EA7FF, visibly disconnected from the tab. Percentages
+     also mean the fill refits itself as the box springs between heights. */
+  --gradient-folder:
+    radial-gradient(
+      100% 64% at 1% 100%,
+      rgba(58, 178, 255, 0.5) 0%,
+      rgba(58, 178, 255, 0.72) 31.7%,
+      rgba(28, 166, 255, 1) 69.2%,
+      rgba(14, 160, 255, 1) 84.6%,
+      rgba(0, 155, 255, 1) 100%
+    ),
+    linear-gradient(-0.39deg, #abdeff 5.77%, #55bdff 45.74%, #009cff 99.27%),
+    linear-gradient(90deg, #222222, #222222);
+  --gradient-resume:
+    linear-gradient(-1.59deg, #46b7ff 5.37%, #55bdff 32.72%, #019bff 97.13%);
+  --gradient-pocket:
+    radial-gradient(
+      103.4% 51.2% at 117% 100%,
+      rgba(58, 178, 255, 0.175) 0%,
+      rgba(96, 193, 255, 0.25) 31.7%,
+      rgba(96, 193, 255, 0.35) 49.5%,
+      rgba(104, 196, 255, 0.35) 100%
+    ),
+    linear-gradient(to top, #58bdfd 0%, #32afff 57.2%, #009cff 100%);
+  --gradient-feed-fade: linear-gradient(to bottom, rgba(14, 14, 14, 0) 7.39%, #0e0e0e 100%);
 }
 
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
+@media (min-width: 64rem) {
+  :root {
+    --folder-unit: 16px; /* @desktop */
+  }
 }
 
+/* The page never scrolls; the feed is the only scroller (both viewports). */
 html,
 body {
   height: 100%;
-}
-
-html {
-  color-scheme: dark;
-}
-
-body {
-  margin: 0;
-  /* keep iOS rubber-band from flashing white behind the near-black surface */
-  background: #000;
-  background-color: var(--bg-black);
-  color: var(--zinc-200);
-  font-family: var(--sans);
-  font-size: 14px;
-  line-height: 1.5;
-  letter-spacing: -0.01em;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  font-variant-ligatures: none;
-  -webkit-text-size-adjust: 100%;
-  -webkit-tap-highlight-color: transparent;
-  /* the main column scrolls internally; the document itself never does */
   overflow: hidden;
-  overscroll-behavior-y: none;
+  background: var(--color-bg);
+  color: var(--color-fg);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
-button {
-  font: inherit;
-  color: inherit;
-  background: transparent;
-  border: 0;
-  padding: 0;
-  cursor: pointer;
+/* Scrollbar hidden by Nic's call — the feed still scrolls natively. */
+@utility scrollbar-hidden {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
 
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
-ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-/* numerals that shouldn't jitter (years, ids) */
-.tabular {
-  font-variant-numeric: tabular-nums;
-}
-
-/* narrow, terminal-feeling scrollbar on the scrollable regions */
-.scroll-thin {
-  scrollbar-width: thin;
-  scrollbar-color: #27272a #0a0a0a;
-}
-.scroll-thin::-webkit-scrollbar {
-  width: 8px;
-}
-.scroll-thin::-webkit-scrollbar-track {
-  background: var(--bg-black);
-}
-.scroll-thin::-webkit-scrollbar-thumb {
-  background: #27272a;
-  border-radius: 4px;
-}
-.scroll-thin::-webkit-scrollbar-thumb:hover {
-  background: #3f3f46;
-}
-
-/* accessible but minimal focus rings */
-:focus-visible {
-  outline: 1px solid var(--zinc-600);
-  outline-offset: 2px;
-  border-radius: 2px;
-}
-
-::selection {
-  background: #1f2a22;
-  color: var(--mint);
+/* Motion is gated in JS via useReducedMotion(); this is the CSS backstop for
+   anything driven by transitions. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
