@@ -87,9 +87,12 @@ export default function ResumeFolder({ run = 0 }: { run?: number }) {
         <motion.div
           className="absolute rounded-[0.75em] bg-white shadow-cv"
           style={{
-            left: em(CARD.left),
+            /* Horizontal position as a share of the box, so the card stays
+               centred in its pocket when @mobile stretches the box to the
+               column (434:3682: 20.30 / 324.81 of 365.4). */
+            left: `${((CARD.left / 406) * 100).toFixed(4)}%`,
             top: em(CARD.top),
-            width: em(CARD.width),
+            width: `${((CARD.width / 406) * 100).toFixed(4)}%`,
             height: em(CARD.height),
             y: translate,
           }}

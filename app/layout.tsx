@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { EB_Garamond, Inter } from "next/font/google";
+import { EB_Garamond, Geist_Mono, Inter } from "next/font/google";
 import "./globals.css";
 import MotionProvider from "./components/MotionProvider";
 
@@ -21,11 +21,26 @@ const ebGaramond = EB_Garamond({
   display: "swap",
 });
 
+/* Geist Mono Light carries the PROBLEM / SOLUTION / APPROACH labels on the
+   project pages (672:3003 and siblings) — a deliberate design font, not a
+   system label, so it ships rather than falling back to Inter. */
+const geistMono = Geist_Mono({
+  subsets: ["latin"],
+  weight: "300",
+  variable: "--font-geist-mono",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   metadataBase: new URL("https://nickoh.online"),
-  title: "Nicholas Koh — Product Designer",
+  title: {
+    default: "Nicholas Koh — Product Designer",
+    /* project pages: "Refine — Nicholas Koh". Next announces route changes
+       from the title, so each project gets its own. */
+    template: "%s — Nicholas Koh",
+  },
   description:
-    "Hello! I'm Nicholas, a product designer who loves building experiences that simplify complex problems. I work best where form sharpens function, always hunting for the shortcut hiding within a long route, where I believe simple carries character",
+    "Hello! I'm Nicholas, a product designer who loves building experiences that simplify complex problems. I work best where form sharpens function, always hunting for the shortcut hiding within a long route",
   openGraph: {
     title: "Nicholas Koh — Product Designer",
     description:
@@ -50,7 +65,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${ebGaramond.variable}`}>
+    <html lang="en" className={`${inter.variable} ${ebGaramond.variable} ${geistMono.variable}`}>
       <body>
         <MotionProvider>{children}</MotionProvider>
       </body>

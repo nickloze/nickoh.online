@@ -14,8 +14,9 @@ export const tabs: { id: Tab; label: string }[] = [
   { id: "cv", label: "Download CV" },
 ];
 
-/* About — node 414:3218 as instanced on the main frame (434:3687), which
-   italicises both "Nicholas" and "form sharpens function". */
+/* About — node 414:3218 as instanced on the main frame (434:3687). Figma
+   italicises only "form sharpens function"; "Nicholas" stays italic by Nic's
+   call. No closing full stop, as drawn. */
 export const bio: Segment[] = [
   { text: "Hello! I'm ", serif: true },
   { text: "Nicholas", italic: true },
@@ -25,7 +26,7 @@ export const bio: Segment[] = [
   },
   { text: "form sharpens function", italic: true },
   {
-    text: ", always hunting for the shortcut hiding within a long route, where I believe simple carries character",
+    text: ", always hunting for the shortcut hiding within a long route",
     serif: true,
   },
 ];
@@ -54,49 +55,4 @@ export const availability: Segment[] = [
   { text: "Work" },
 ];
 
-/* Project feed — nodes 373:2676 / 373:2688 / 373:2700 (@desktop) and
-   438:5359 (@mobile). Ratios are the slide boxes as drawn: 954 × 512.77,
-   954 × 450.42 and 331 × 225.74. */
-export type Project = {
-  slug: string;
-  title: string;
-  client: string;
-  year: string;
-  cover: { src: string; width: number; height: number; alt: string };
-  ratio: { desktop: number; mobile: number };
-  /* Node 373:2689 draws its image larger than the box: 108.71% wide,
-     118.23% tall, shifted −2.73% / −7.28%. */
-  crop?: { width: string; height: string; left: string; top: string };
-};
-
-const DESKTOP_FIRST = 954 / 512.77496; /* aspect 2400 / 1290 on 373:2677 */
-const DESKTOP_REST = 954 / 450.42001;
-const MOBILE = 331 / 225.74106;
-
-export const projects: Project[] = [
-  {
-    slug: "refine",
-    title: "Your cursor becomes an AI shortcut",
-    client: "Refine",
-    year: "2026",
-    cover: { src: "/work/refine/cover.jpg", width: 3840, height: 2160, alt: "" },
-    ratio: { desktop: DESKTOP_FIRST, mobile: MOBILE },
-  },
-  {
-    slug: "petch",
-    title: "Personal health gamified",
-    client: "Petch",
-    year: "2026",
-    cover: { src: "/work/petch/cover.png", width: 1488, height: 904, alt: "" },
-    ratio: { desktop: DESKTOP_REST, mobile: MOBILE },
-    crop: { width: "108.71%", height: "118.23%", left: "-2.73%", top: "-7.28%" },
-  },
-  {
-    slug: "stripe",
-    title: "Transparent shopping experience",
-    client: "Stripe",
-    year: "2026",
-    cover: { src: "/work/stripe/cover.png", width: 1200, height: 900, alt: "" },
-    ratio: { desktop: DESKTOP_REST, mobile: MOBILE },
-  },
-];
+/* Projects — the feed cards and the project pages — live in ./projects.ts. */

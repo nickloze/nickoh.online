@@ -1,6 +1,7 @@
 /* The folder box under the tabs. Heights and the top-left corner come from
-   the three variants of component set 434:3685; units are the folder's em
-   (16px @desktop, 13.04px @mobile). */
+   the three variants (434:3683 About · 434:3684 Socials · 434:3682 Resume),
+   drawn at 0.9 — so each is Figma px ÷ 0.9 in the folder's 406-wide units
+   (14.4px @desktop and tablet, 11.74px @mobile at 402). */
 
 import type { Tab } from "../lib/data";
 
@@ -8,9 +9,9 @@ const UNIT = 16;
 const em = (px: number) => `${(px / UNIT).toFixed(5)}em`;
 
 export const BODY_HEIGHT: Record<Tab, string> = {
-  about: em(202),
-  chat: em(115),
-  cv: em(202),
+  about: em(162.222), /* 146 px — the box hugs the 20px bio */
+  chat: em(114.667), /* 135.2 − 32 = 103.2 px */
+  cv: em(202), /* 181.8 px */
 };
 
 /* About's tab is flush with the box, so that corner is square; the other two
@@ -59,5 +60,20 @@ export const PLATE_IN = 0.24;
 
 /* Tab labels: inactive 0.2 → active 1 (component set 434:3685). */
 export const LABEL = {
+  transition: { duration: 0.15, ease: "easeOut" as const },
+};
+
+/* The About card as the way home.
+
+   Not in Figma — the frames draw no project-open state for the panel — so it
+   borrows the two cues the site already has: the next-project card's "the
+   thing you are about to press comes up", and the tab labels' 150ms, so the
+   folder has a single hover speed. A white veil over the gradient rather than
+   a filter on the box: the bio sits above it and is left exactly as it is. */
+export const HOME_VEIL = {
+  /* 0.1 white: enough to read as the card lighting up under the pointer in
+     150ms, short of the milky wash that 0.16 leaves on the deep blue in the
+     bottom-left corner of the gradient. */
+  opacity: 0.1,
   transition: { duration: 0.15, ease: "easeOut" as const },
 };

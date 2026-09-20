@@ -2,8 +2,10 @@
 
    Source of truth: Figma file k56TffzeUrNoE61NvHqRj3
      @desktop  frame 373:2659 "Main"              1512 × 982
+               project frames 672:3003 Refine · 567:780 Petch · 605:1398 SOS ·
+               615:2321 Shopping AI
      @mobile   frame 441:243  "Tabs Compact Dark"  402 × 874
-     folder    component set 434:3685 "Desktop"
+     folder    variants 434:3683 About · 434:3684 Socials · 434:3682 Resume
 
    The Figma file defines no variables; every token below is lifted from the
    raw values on those nodes. Tailwind v4 emits the @theme block as :root
@@ -19,28 +21,38 @@
   --color-fg-muted: rgba(255, 255, 255, 0.75);   /* client name on a card   */
   --color-fg-dim: rgba(255, 255, 255, 0.5);      /* resting socials rows     */
   --color-fg-faint: rgba(255, 255, 255, 0.2);    /* inactive tab labels      */
+  --color-meta: rgba(255, 254, 254, 0.7);        /* PROJECT / YEAR labels    */
+  --color-pill: #252525;                         /* project tag pills        */
   --color-tab: #019bff;                          /* the notch                */
-  --color-folder-base: #222222;                  /* under the folder gradient*/
+  --color-folder-base: #222222;                  /* Figma's fill under the folder gradient — not painted, see --gradient-folder */
   --color-available: #6aff00;                    /* availability dot         */
 
   /* type — Inter carries everything sans (the Figma SF Pro labels included,
-     per Nic's call); EB Garamond carries the bio, socials and "for". */
+     per Nic's call); EB Garamond carries the bio, socials and "for"; Geist
+     Mono Light carries the PROBLEM / SOLUTION labels on project pages. */
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-serif: var(--font-eb-garamond), Georgia, "Times New Roman", serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, "SFMono-Regular", monospace;
 
-  /* geometry */
-  --breakpoint-desktop: 64rem;                   /* @desktop from 1024px    */
-  --width-panel: 406px;                          /* 373:2661                 */
-  --width-folder-mobile: 330.8px;                /* 461:2630                 */
+  /* geometry
+     Three tiers, one DOM:
+       @mobile          < 768   the 402 frame (441:243)
+       @mobile (tablet) 768–1023 the @mobile layout at desktop sizes
+       @desktop         ≥ 1024  the 1512 frame (373:2659) */
+  --breakpoint-tablet: 48rem;                    /* @mobile (tablet) from 768 */
+  --breakpoint-desktop: 64rem;                   /* @desktop from 1024       */
+  --width-panel: 365.4px;                        /* 373:2661                 */
   --spacing-frame: 64px;                         /* 373:2659 padding         */
-  --spacing-col-gap: 24px;                       /* 373:2660 gap · 441 gap   */
+  --spacing-col-gap: 24px;                       /* 373:2660 gap             */
   --spacing-card-pt: 12px;
   --spacing-card-pb: 48px;                       /* 373:2679                 */
   --spacing-card-pb-mobile: 24px;                /* 437:5317                 */
-  --spacing-mobile-side: 34px;                   /* 373:2715 x               */
-  --spacing-mobile-top: 15px;                    /* 77 − 62 status bar       */
-  --spacing-mobile-bottom: 19px;                 /* 773 → 792 Safari bar     */
-  --radius-card: 4px;
+  --spacing-mobile-left: 36px;                   /* 503:4510 x               */
+  --spacing-mobile-right: 35px;                  /* 402 − 36 − 331           */
+  --spacing-mobile-bottom: 13px;                 /* 779 → 792 Safari bar     */
+  --spacing-tablet-side: 40px;                   /* home and project alike   */
+  --radius-card: 8px;                            /* every cover and media    */
+  --radius-card-mobile: 4px;                     /* 437:5315                 */
   --radius-cv-card: 12px;
 
   /* shadows */
@@ -50,21 +62,34 @@
 }
 
 :root {
-  /* The folder is drawn once at 406 wide and every internal size is in em,
-     so one unit scales it: 16px @desktop, 13.04px @mobile (330.8 / 406). */
-  --folder-unit: 13.04px;
+  /* The folder is drawn once in 406 units and every internal size is in em,
+     so one unit scales it. Figma now draws it at 0.9 (365.4 wide), so
+     @desktop and tablet are 14.4px. @mobile scales that by 0.8153 (the 441:243
+     instance) at 402 and keeps shrinking with the column below it, so the bio
+     keeps its line breaks on a 360 or 320 phone. */
+  --folder-unit: min(11.74px, calc((100vw - 71px) * 11.74 / 331));
+
+  /* @mobile — the caption row under each cover: 12px at the 402 frame. Below
+     402 it scales with the column, like --folder-unit, so a narrow phone keeps
+     the 402 frame's line breaks instead of the client / year block (which
+     cannot wrap) squeezing the title into a sliver of 4 short lines. Never
+     below 9px (that is a 320 phone; it only bites in a window narrower than
+     that). From tablet up the desktop sizes take over. */
+  --caption-size: max(9px, min(12px, calc((100vw - 71px) * 12 / 331)));
 
   /* Gradients are multi-layer in Figma; kept verbatim here rather than in
      @theme so the layer stacks stay readable. */
   /* The radial is sized as a proportion of the box, not in fixed units, which
-     is how Figma draws it: the About variant (434:3683) fits it to a 202-tall
-     box (vertical radius 128.3 = 63.5%) and Socials (434:3684) refits it to
-     115 (74.9 = 65.1%). Both therefore reach the outer stop — #009BFF, the
-     notch's colour — well before the top edge, so the tab and the box top read
-     as one piece of card in every state. Pinning it in em instead left the
-     short Socials box entirely inside the light centre of the radial and its
-     top edge came out #1EA7FF, visibly disconnected from the tab. Percentages
-     also mean the fill refits itself as the box springs between heights. */
+     is how Figma draws it: the About variant (434:3683) fits it to the box
+     height and Socials (434:3684) refits it to its shorter box. Both reach the
+     outer stop — #009BFF, the notch's colour — well before the top edge, so
+     the tab and the box top read as one piece of card in every state.
+     Percentages also mean the fill refits itself as the box springs between
+     heights.
+     Figma also lists a #222 base fill under the two gradients. The linear one
+     above it is fully opaque, so that base is never seen — except that, painted,
+     it darkens the anti-aliased top edge of the box and shows as a hairline
+     where the tab meets it. It is left out. */
   --gradient-folder:
     radial-gradient(
       100% 64% at 1% 100%,
@@ -74,8 +99,7 @@
       rgba(14, 160, 255, 1) 84.6%,
       rgba(0, 155, 255, 1) 100%
     ),
-    linear-gradient(-0.39deg, #abdeff 5.77%, #55bdff 45.74%, #009cff 99.27%),
-    linear-gradient(90deg, #222222, #222222);
+    linear-gradient(-0.31deg, #abdeff 5.77%, #55bdff 45.74%, #009cff 99.27%);
   --gradient-resume:
     linear-gradient(-1.59deg, #46b7ff 5.37%, #55bdff 32.72%, #019bff 97.13%);
   --gradient-pocket:
@@ -87,16 +111,88 @@
       rgba(104, 196, 255, 0.35) 100%
     ),
     linear-gradient(to top, #58bdfd 0%, #32afff 57.2%, #009cff 100%);
-  --gradient-feed-fade: linear-gradient(to bottom, rgba(14, 14, 14, 0) 7.39%, #0e0e0e 100%);
+  /* @mobile — the folder panel is given the height of the folder's tallest
+     state (35 tab row + 202 box = 237 units), so the row never resizes when a
+     tab changes. Shared by Panel (which is that tall) and the feed fade below
+     (which reaches past it to the bottom of the screen). */
+  --height-folder-panel: calc(14.8125 * var(--folder-unit));
+
+  /* @mobile — everything between the bottom edge of the feed window and the
+     bottom of the screen: the column gap, the folder panel, and the frame's
+     bottom padding. The feed fade reaches across it. */
+  --height-feed-foot: calc(
+    var(--spacing-col-gap) + var(--height-folder-panel) + var(--spacing-mobile-bottom) +
+      env(safe-area-inset-bottom)
+  );
+
+  /* @mobile — 503:4536, the fade over the bottom of the feed window: the soft
+     edge that keeps a card from being cut in half where the window clips.
+
+     Figma draws the band 264.741 tall, which is 44% of the window at 402 ×
+     812 — it washed out the middle of the scroll and swallowed the last card
+     whole at the end of it. 96 is the edge it was always meant to be. Figma's
+     curve is kept, just shorter: its 2.954% lead and 86.64% arrival scaled to
+     96, which leaves ~13px of solid at the bottom so nothing reaches the clip
+     still visible.
+
+     Kept in step with FADE_RETREAT in app/motion/feed.ts, which retires the
+     band over the last 96px of the scroll — the feed ends on its last card,
+     not on a hole held open under a fade. */
+  --height-feed-band: 96px;
+
+  /* The fade element is full bleed: edge to edge of the screen, and from the
+     top of the band down past the feed to the screen's bottom, so a card
+     expanding past the column (EXPAND_ROOM) is never cut off at the fade's
+     edge and the field below the feed has no seam in it. The stops are in px
+     rather than Figma's percentages for that reason — percentages would
+     stretch the band over that whole run. */
+  --height-feed-fade: calc(var(--height-feed-band) + var(--height-feed-foot));
+  --gradient-feed-fade: linear-gradient(to bottom, rgba(14, 14, 14, 0) 2.836px, #0e0e0e 83.174px);
+
+  /* The next-project card at the foot of a story — Figma 806:3193.
+
+     That frame carries no text, so what it shows is the COVER treatment on
+     its own, and measuring it off the render gives an almost perfectly linear
+     ramp: 0 at the top, 0.48 at the midpoint, 0.97 at the bottom, with no
+     plateau and no knee anywhere. That long even fall is the whole point —
+     the previous scrim went 0 → 0.86 inside 62px and lived only on the text
+     block, which put a visible edge across the middle of the card.
+
+     Two layers, because the frame's ramp alone cannot carry type: at the
+     label's line it is only ~0.80, and white on 0.80 over a white frame (the
+     Shopping AI cover has one) is under 4.5:1.
+       --gradient-next-cover        the frame's ramp, over the cover.
+       --gradient-next-scrim        under the words only. It rises across the
+                                    whole text block rather than snapping on,
+                                    so the two read as one gradient.
+     Both are constant. A lifted variant of the ramp used to crossfade in on
+     hover, brightening the picture under the pointer; Nic dropped it, and the
+     card answers a pointer by rising instead (app/motion/next.ts). Nothing
+     here has a state any more, so the type's contrast cannot be caught
+     part-way through one.  */
+  --gradient-next-cover:
+    linear-gradient(
+      to bottom,
+      rgba(14, 14, 14, 0) 0%,
+      rgba(14, 14, 14, 0.48) 50%,
+      rgba(14, 14, 14, 0.97) 100%
+    );
+  --gradient-next-scrim:
+    linear-gradient(
+      to top,
+      rgba(14, 14, 14, 0.9) 0%,
+      rgba(14, 14, 14, 0.68) 50%,
+      rgba(14, 14, 14, 0) 100%
+    );
 }
 
-@media (min-width: 64rem) {
+@media (min-width: 48rem) {
   :root {
-    --folder-unit: 16px; /* @desktop */
+    --folder-unit: 14.4px; /* @mobile (tablet) and @desktop */
   }
 }
 
-/* The page never scrolls; the feed is the only scroller (both viewports). */
+/* The page never scrolls; the feed (or an open project) is the only scroller. */
 html,
 body {
   height: 100%;
@@ -108,12 +204,26 @@ body {
   text-rendering: optimizeLegibility;
 }
 
-/* Scrollbar hidden by Nic's call — the feed still scrolls natively. */
+/* Scrollbar hidden by Nic's call — the scrollers still scroll natively. */
 @utility scrollbar-hidden {
   scrollbar-width: none;
   &::-webkit-scrollbar {
     display: none;
   }
+}
+
+/* Figma trims the project headings and captions to cap height and baseline
+   (text-box-trim cap/alphabetic); its gaps are measured to those trimmed
+   boxes. Browsers without text-box support just sit a little looser. */
+@utility text-trim {
+  text-box: trim-both cap alphabetic;
+}
+
+/* Videos are decoration driven by scroll, never by a control — iOS must not
+   paint its own start-playback glyph over the still. */
+video::-webkit-media-controls-start-playback-button {
+  display: none !important;
+  -webkit-appearance: none;
 }
 
 /* Motion is gated in JS via useReducedMotion(); this is the CSS backstop for

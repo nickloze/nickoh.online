@@ -1,16 +1,19 @@
 /* The folder-tab notch — geometry and springs.
 
-   Figma (component set 434:3685) draws the active tab as one of three
-   vectors, all 35 tall, fill #019BFF, in a 406-wide row:
+   Figma draws the folder at 0.9 of the original 406-wide component (365.4,
+   variants 434:3683 / 434:3684 / 434:3682); every number below is in the
+   406-wide units (Figma px ÷ 0.9), which `--folder-unit` scales back. The
+   active tab is one of three vectors, all 35 units tall, fill #019BFF:
 
      About       M0 4 C0 1.79 1.79 0 4 0 H66.33 C68.16 0 69.75 1.24 70.20 3.00 L78.43 35 L0 35 Z
      Let's Chat  M8.23 3.00 C8.68 1.24 10.28 0 12.10 0 H98.97 C100.79 0 102.39 1.24 102.84 3.00 L111.07 35 H0 Z   (at x 79)
-     Download CV M8.23 3.00 C8.68 1.24 10.28 0 12.10 0 H126.38 C128.21 0 129.80 1.24 130.25 3.00 L138.48 35 H0 Z  (at x 191)
+     Download CV M8.23 3.00 … L136.84 35 H0 Z   (at x 190.11 — 603:1333 at 171.10 px, 123.15 wide)
 
    About's left edge is vertical with a 4px arc; every other edge is slanted
    8.23 over 32 with a ~2px eased corner. All three share the command skeleton
-   `M L C H C L Z`, so the notch is one <path> whose numbers interpolate — it
-   is never swapped or crossfaded.
+   `M L L C H C L L Z` (the two extra L's are the bleed below it), so the
+   notch is one <path> whose numbers interpolate — it is never swapped or
+   crossfaded.
 
    The moving parts are three numbers:
      lb     left edge x at the bottom
@@ -23,6 +26,14 @@ import type { Tab } from "../lib/data";
 export const NOTCH_WIDTH = 406;
 export const NOTCH_HEIGHT = 35;
 export const SLANT = 8.22759;
+
+/* The notch and the box under it are two shapes that meet edge to edge, and
+   wherever their edges land between device pixels a row of the page behind
+   shows through — a hairline under the tab (most widths and pixel densities,
+   @mobile and @desktop alike). So the notch carries on this far below its own
+   bottom edge, in the same units, sliding under the top of the box: the box is
+   painted over it, and any row that would have been missed is already blue. */
+export const NOTCH_BLEED = 3;
 
 /* Figma's eased corner at the top of a slanted edge (relative to the point
    where the slant meets y = 3.00383). */
@@ -47,16 +58,22 @@ export type NotchPose = { lb: number; rb: number; slant: number };
 
 export const NOTCH_POSE: Record<Tab, NotchPose> = {
   about: { lb: 0, rb: 78.4315, slant: 0 },
-  chat: { lb: 79, rb: 79 + 111.068, slant: SLANT },
-  cv: { lb: 191, rb: 191 + 138.481, slant: SLANT },
+  chat: { lb: 78.4315, rb: 78.4315 + 111.068, slant: SLANT },
+  cv: { lb: 190.111, rb: 190.111 + 136.838, slant: SLANT },
 };
 
-/* Tab slot boxes for the buttons that sit on top of the notch. */
+/* Tab slot boxes for the buttons that sit on top of the notch. The labels
+   stay 16px at 1512 while the folder is drawn at 0.9, so their x comes
+   straight from the text nodes (603:1328 / 1331 / 1334: 10.35, 84.07,
+   183.68 px) rather than from scaling the old slots. */
 export const TAB_SLOT: Record<Tab, { x: number; w: number; labelX: number }> = {
-  about: { x: 0, w: 79, labelX: 14.5 },
-  chat: { x: 79, w: 112, labelX: 19.5 },
-  cv: { x: 191, w: 139, labelX: 20.5 },
+  about: { x: 0, w: 78.4315, labelX: 11.496 },
+  chat: { x: 78.4315, w: 111.068, labelX: 14.979 },
+  cv: { x: 190.111, w: 136.838, labelX: 13.978 },
 };
+
+/* Label top — 6.73 px in Figma. */
+export const LABEL_TOP = 7.472;
 
 const MIN_WIDTH = 40;
 const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v));
@@ -78,14 +95,17 @@ export function buildNotchPath({ lb, rb, slant }: NotchPose): string {
 
   const rt = rb - SLANT;
   const H = NOTCH_HEIGHT;
+  const B = H + NOTCH_BLEED;
 
   return [
-    `M${f(lb)} ${H}`,
+    `M${f(lb)} ${B}`,
+    `L${f(lb)} ${H}`,
     `L${f(lt)} ${f(topY)}`,
     `C${f(c1x)} ${f(c1y)} ${f(c2x)} 0 ${f(endX)} 0`,
     `H${f(rt - C.endX)}`,
     `C${f(rt - C.c2x)} 0 ${f(rt - C.c1x)} ${f(C.c1y)} ${f(rt)} ${f(C.topY)}`,
     `L${f(rb)} ${H}`,
+    `L${f(rb)} ${B}`,
     "Z",
   ].join(" ");
 }

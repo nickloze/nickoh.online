@@ -1,11 +1,11 @@
 import { availability } from "../../lib/data";
 
-/* Figma 457:2613 — a soft green dot and "Available for Work" at 22px, with
+/* Figma 457:2613 — a soft green dot and "Available for Work" at 14px, with
    "for" in EB Garamond italic. @desktop only; the mobile frame has no such
    row. */
 export default function Availability() {
   return (
-    <p className="flex items-center gap-2 text-[22px] leading-[29px] text-fg">
+    <p className="flex items-center gap-2 text-[14px] leading-[18px] text-fg">
       <span
         aria-hidden="true"
         className="size-4 shrink-0 rounded-full"

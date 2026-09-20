@@ -5,9 +5,10 @@ import type { Tab } from "../../lib/data";
 import FolderBody from "./FolderBody";
 import FolderTabs from "./FolderTabs";
 
-/* The folder — Figma component set 434:3685 "Desktop". Drawn at 406 units
-   wide; `--folder-unit` scales it (16px @desktop, 13.04px @mobile). Owns the
-   only piece of state in the panel: which tab is active. */
+/* The folder — Figma variants 434:3683 / 434:3684 / 434:3682 ("Desktop").
+   Drawn in 406 units; `--folder-unit` scales it (14.4px @desktop and tablet —
+   365.4 wide — and 11.74px @mobile at 402, where the box stretches to the
+   column). Owns the only piece of state in the panel: which tab is active. */
 export default function Folder() {
   const [active, setActive] = useState<Tab>("about");
   /* Bumped on every selection of Download CV, so the card's rise replays each

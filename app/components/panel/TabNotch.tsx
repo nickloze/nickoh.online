@@ -45,7 +45,7 @@ export default function TabNotch({ active }: { active: Tab }) {
   return (
     <svg
       aria-hidden="true"
-      className="absolute inset-0 block size-full"
+      className="absolute inset-0 block size-full overflow-visible"
       viewBox={`0 0 ${NOTCH_WIDTH} ${NOTCH_HEIGHT}`}
       preserveAspectRatio="none"
       fill="none"
