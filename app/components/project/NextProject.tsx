@@ -45,8 +45,8 @@ import { useProject } from "../ProjectContext";
    @desktop  995 × 240 — the cover cropped to the floor the page's own cover is
              allowed to shrink to, so the panel is a strip of the page to come
              and never a second hero.
-   @mobile   331 × 160 — a taller crop, because at 331 the desktop strip leaves
-             no room under the name.
+   @mobile   371 × 179 — a taller crop, because at the mobile column width the
+             desktop strip leaves no room under the name.
    @mobile (tablet) — the @desktop crop at the tablet margins. */
 
 export default function NextProject({ project }: { project: Project }) {
@@ -74,7 +74,7 @@ export default function NextProject({ project }: { project: Project }) {
       <div className="group relative mt-[24px] grid w-full grid-cols-1 overflow-hidden rounded-[var(--radius-card-mobile)] transition-transform duration-[420ms] ease-[cubic-bezier(0.4,0,0.2,1)] will-change-transform [&:has([data-next-panel]:hover)]:-translate-y-[6px] [&:has([data-next-panel]:focus-visible)]:-translate-y-[6px] [&:has([data-next-panel]:active)]:-translate-y-[6px] motion-reduce:transition-none motion-reduce:[&:has([data-next-panel]:hover)]:translate-y-0 motion-reduce:[&:has([data-next-panel]:focus-visible)]:translate-y-0 motion-reduce:[&:has([data-next-panel]:active)]:translate-y-0 tablet:mt-[45px] tablet:rounded-card">
         <div
           aria-hidden="true"
-          className="[grid-area:1/1] w-full [aspect-ratio:331/160] tablet:[aspect-ratio:995/240]"
+          className="[grid-area:1/1] w-full [aspect-ratio:371/179] tablet:[aspect-ratio:995/240]"
         />
 
         {/* the cover, centred on its own 995 : 550 shape so the strip crops it
@@ -85,7 +85,7 @@ export default function NextProject({ project }: { project: Project }) {
               src={next.cover.still}
               alt=""
               fill
-              sizes="(min-width: 64rem) 995px, (min-width: 48rem) calc(100vw - 80px), calc(100vw - 71px)"
+              sizes="(min-width: 64rem) 995px, (min-width: 48rem) calc(100vw - 80px), calc(100vw - 31px)"
               className="object-cover"
             />
           </div>

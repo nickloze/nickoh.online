@@ -203,7 +203,7 @@ export default function ProjectView({ project }: { project: Project }) {
               gen={gen}
               fly={fly}
               priority
-              sizes="(min-width: 64rem) 995px, (min-width: 48rem) calc(100vw - 80px), calc(100vw - 71px)"
+              sizes="(min-width: 64rem) 995px, (min-width: 48rem) calc(100vw - 80px), calc(100vw - 31px)"
             />
           </div>
 

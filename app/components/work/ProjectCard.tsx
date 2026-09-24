@@ -86,7 +86,7 @@ export default function ProjectCard({
               gen={gen}
               fly
               priority={index === 0}
-              sizes="(min-width: 64rem) 995px, (min-width: 48rem) calc(100vw - 80px), calc(100vw - 71px)"
+              sizes="(min-width: 64rem) 995px, (min-width: 48rem) calc(100vw - 80px), calc(100vw - 31px)"
             />
           )}
         </motion.div>

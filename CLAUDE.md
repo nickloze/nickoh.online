@@ -41,7 +41,7 @@ One DOM tree, three tiers (`app/components/Shell.tsx`), living in the `(site)` r
 ### @mobile
 - Reference frame: **402px wide** — iPhone 17 Pro CSS viewport (1206px physical ÷ 3x DPR), Figma `441:243`
 - Device pixel ratio: 3x (@3x assets where applicable)
-- Layout: single column, 36 / 35 side margins — the feed scrolls in a window on top (with a fade over its bottom), the folder sits below it: tabs at 0.8153 × the 365.4 folder, box stretched to the 331 column, `--folder-unit` fluid below 402 so the bio keeps its line breaks (and `--caption-size` does the same for the card captions, floor 9px). An open project takes the whole screen; the folder slides away and a bottom bar (← All work · ‹ 2/4 ›) takes its place
+- Layout: single column, 16 / 15 side margins (manual override from the Figma-derived 36 / 35, per Nic's request for a slightly wider column) — the feed scrolls in a window on top (with a fade over its bottom), the folder sits below it: tabs at 0.8153 × the 365.4 folder, box stretched to the 371 column, `--folder-unit` fluid below 402 so the bio keeps its line breaks (and `--caption-size` does the same for the card captions, floor 9px). An open project takes the whole screen; the folder slides away and a bottom bar (← All work · ‹ 2/4 ›) takes its place
 - Interactions: tap and long-press only — no hover-dependent logic
 - Touch targets: minimum 44×44px for all interactive elements
 - Safe area: respect top and bottom safe-area insets for the Dynamic Island and the browser bar

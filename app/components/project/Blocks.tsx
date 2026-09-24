@@ -15,8 +15,8 @@ import LoopVideo from "../media/LoopVideo";
    Each media element is a play group (useVideoPlayback). The pair and the
    phones share a group name, so they play together while side by side. */
 
-const WIDE = "(min-width: 64rem) 995px, (min-width: 48rem) calc(100vw - 80px), calc(100vw - 71px)";
-const HALF = "(min-width: 64rem) 486px, (min-width: 48rem) calc(50vw - 52px), calc(100vw - 71px)";
+const WIDE = "(min-width: 64rem) 995px, (min-width: 48rem) calc(100vw - 80px), calc(100vw - 31px)";
+const HALF = "(min-width: 64rem) 486px, (min-width: 48rem) calc(50vw - 52px), calc(100vw - 31px)";
 const PHONE = "(min-width: 64rem) 272px, (min-width: 48rem) 28vw, 62vw";
 
 function Frame({ media, sizes, group }: { media: Media; sizes: string; group?: string }) {

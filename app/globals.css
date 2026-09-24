@@ -47,8 +47,8 @@
   --spacing-card-pt: 12px;
   --spacing-card-pb: 48px;                       /* 373:2679                 */
   --spacing-card-pb-mobile: 24px;                /* 437:5317                 */
-  --spacing-mobile-left: 36px;                   /* 503:4510 x               */
-  --spacing-mobile-right: 35px;                  /* 402 − 36 − 331           */
+  --spacing-mobile-left: 16px;                   /* manual override: 371 column, not a Figma node — was 36 (503:4510 x) */
+  --spacing-mobile-right: 15px;                  /* 402 − 16 − 371           */
   --spacing-mobile-bottom: 13px;                 /* 779 → 792 Safari bar     */
   --spacing-tablet-side: 40px;                   /* home and project alike   */
   --radius-card: 8px;                            /* every cover and media    */
@@ -67,7 +67,7 @@
      @desktop and tablet are 14.4px. @mobile scales that by 0.8153 (the 441:243
      instance) at 402 and keeps shrinking with the column below it, so the bio
      keeps its line breaks on a 360 or 320 phone. */
-  --folder-unit: min(11.74px, calc((100vw - 71px) * 11.74 / 331));
+  --folder-unit: min(11.74px, calc((100vw - 31px) * 11.74 / 371));
 
   /* @mobile — the caption row under each cover: 12px at the 402 frame. Below
      402 it scales with the column, like --folder-unit, so a narrow phone keeps
@@ -75,7 +75,7 @@
      cannot wrap) squeezing the title into a sliver of 4 short lines. Never
      below 9px (that is a 320 phone; it only bites in a window narrower than
      that). From tablet up the desktop sizes take over. */
-  --caption-size: max(9px, min(12px, calc((100vw - 71px) * 12 / 331)));
+  --caption-size: max(9px, min(12px, calc((100vw - 31px) * 12 / 371)));
 
   /* Gradients are multi-layer in Figma; kept verbatim here rather than in
      @theme so the layer stacks stay readable. */
