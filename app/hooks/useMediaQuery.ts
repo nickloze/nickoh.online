@@ -17,6 +17,9 @@ export function useMediaQuery(query: string) {
   );
 }
 
+/* @mobile — below the tablet tier at 768px (Tailwind's `tablet:`). */
+export const MOBILE_QUERY = "(max-width: 47.99rem)";
+
 /* @desktop — the tier from 1024px (Tailwind's `desktop:`). */
 export const DESKTOP_QUERY = "(min-width: 64rem)";
 

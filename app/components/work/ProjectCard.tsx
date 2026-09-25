@@ -14,9 +14,10 @@ import { captureFrame } from "../media/LoopVideo";
 /* Figma "Parent" → "Slide" + "project-card › content-row" on 373:2659.
    @desktop  373:2676 — 995 × 521.49 cover, 20px Inter row, pt 12 / pb 48
    @mobile   437:5314 — the same 1.908 cover at the column width (the mock's
-             older 331 × 225.74 slot was drawn around a still), 12px Inter row
-             that wraps at 121, pt 12 / pb 24. Below 402 the row's text scales
-             down with the column (--caption-size, floor 10px) so a narrow
+             older 331 × 225.74 slot was drawn around a still), 15px Inter row
+             (bumped 3px up from Figma's 12px, per Nic's request) that wraps
+             at 121, pt 12 / pb 24. Below 402 the row's text scales
+             down with the column (--caption-size, floor 12px) so a narrow
              phone keeps the same line breaks
    @mobile (tablet) — the @mobile card at @desktop type sizes
 
@@ -106,7 +107,7 @@ export default function ProjectCard({
           }}
           transition={{ scale: EXPAND_SPRING, y: EXPAND_SPRING, opacity: DISSOLVE }}
         >
-          {/* @mobile — sized in em of --caption-size (12px at 402, smaller
+          {/* @mobile — sized in em of --caption-size (15px at 402, smaller
               below it), so the 121px wrap, the 9.058 gap and the tracking all
               scale with the text and the line breaks stay the 402 frame's */}
           <h2 className="max-w-[10.0833em] font-sans text-[length:var(--caption-size)] leading-[normal] font-normal tracking-[-0.015em] text-fg tablet:max-w-none tablet:text-[20px] tablet:tracking-[-0.3px]">

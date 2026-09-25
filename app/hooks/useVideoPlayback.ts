@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, type RefObject } from "react";
-import { useMediaQuery } from "./useMediaQuery";
+import { MOBILE_QUERY, useMediaQuery } from "./useMediaQuery";
 
 /* Which video plays: one "play group" per scroller at a time. There is no
    pause control — the active group loops for as long as it is active. The one
@@ -27,7 +27,11 @@ import { useMediaQuery } from "./useMediaQuery";
    two videos never trade places on every scroll tick.
 
    Only the active group and its neighbours are allowed to fetch
-   (`preload="auto"`); the rest stay `preload="none"`. */
+   (`preload="auto"`); the rest stay `preload="none"`.
+
+   @mobile skips all of that, per Nic's call: every video in the scroller
+   fetches and loops at once, wherever the reader has scrolled. Reduced motion
+   still leaves the stills. */
 
 const HYSTERESIS = 32; /* px another group must beat the current one by */
 
@@ -39,6 +43,7 @@ export function useVideoPlayback(
      with no pause control this is the only thing that can stop the videos, so
      it has to follow a change made while the page is open */
   const reduce = useMediaQuery("(prefers-reduced-motion: reduce)");
+  const mobile = useMediaQuery(MOBILE_QUERY);
 
   useEffect(() => {
     const root = scroller.current;
@@ -82,6 +87,14 @@ export function useVideoPlayback(
     const update = () => {
       if (document.hidden) {
         pauseAll();
+        return;
+      }
+      /* @mobile — every video plays, whatever the scroll position */
+      if (mobile) {
+        for (const v of videosIn(root)) {
+          if (v.preload !== "auto") v.preload = "auto";
+          play(v);
+        }
         return;
       }
       const box = root.getBoundingClientRect();
@@ -148,12 +161,22 @@ export function useVideoPlayback(
     mutations.observe(root, { childList: true, subtree: true });
     schedule();
 
+    /* @mobile — if autoplay was refused (iOS Low Power Mode), the next tap is
+       a user gesture, and play() called inside one is allowed */
+    const retry = () => {
+      if (!blocked) return;
+      blocked = false;
+      videosIn(root).forEach(play);
+    };
+    if (mobile) document.addEventListener("touchend", retry, { passive: true });
+
     return () => {
+      document.removeEventListener("touchend", retry);
       cancelAnimationFrame(raf);
       root.removeEventListener("scroll", schedule, { capture: true });
       window.removeEventListener("resize", schedule);
       document.removeEventListener("visibilitychange", schedule);
       mutations.disconnect();
     };
-  }, [scroller, enabled, reduce]);
+  }, [scroller, enabled, reduce, mobile]);
 }

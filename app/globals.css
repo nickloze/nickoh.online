@@ -69,13 +69,14 @@
      keeps its line breaks on a 360 or 320 phone. */
   --folder-unit: min(11.74px, calc((100vw - 31px) * 11.74 / 371));
 
-  /* @mobile — the caption row under each cover: 12px at the 402 frame. Below
-     402 it scales with the column, like --folder-unit, so a narrow phone keeps
+  /* @mobile — the caption row under each cover: 15px at the 402 frame (bumped
+     3px up from the Figma-derived 12px, per Nic's request). Below 402 it
+     scales with the column, like --folder-unit, so a narrow phone keeps
      the 402 frame's line breaks instead of the client / year block (which
      cannot wrap) squeezing the title into a sliver of 4 short lines. Never
-     below 9px (that is a 320 phone; it only bites in a window narrower than
+     below 12px (that is a 320 phone; it only bites in a window narrower than
      that). From tablet up the desktop sizes take over. */
-  --caption-size: max(9px, min(12px, calc((100vw - 31px) * 12 / 371)));
+  --caption-size: max(12px, min(15px, calc((100vw - 31px) * 15 / 371)));
 
   /* Gradients are multi-layer in Figma; kept verbatim here rather than in
      @theme so the layer stacks stay readable. */
